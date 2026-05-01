@@ -3,3 +3,4 @@
 
 plan.out
 terraform.tfstate
+run*.output
