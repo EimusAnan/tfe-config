@@ -3,6 +3,11 @@ variable "project_id" {
   type        = string
 }
 
+variable "region" {
+  description = "GCP Region"
+  type        = string
+}
+
 variable "pool_id" {
   description = "Workload Identity Pool ID"
   type        = string

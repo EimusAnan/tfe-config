@@ -4,3 +4,4 @@
 plan.out
 terraform.tfstate
 run*.output
+terraform.tfstate.backup
