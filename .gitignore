@@ -5,3 +5,6 @@ plan.out
 terraform.tfstate
 run*.output
 terraform.tfstate.backup
+plan.json
+plan.ouy
+token.json
