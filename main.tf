@@ -6,7 +6,7 @@ resource "google_project_service" "required_apis" {
     "sts.googleapis.com",
     "serviceusage.googleapis.com"
   ])
-  
+
   service            = each.value
   disable_on_destroy = false
 }
@@ -16,9 +16,9 @@ resource "google_iam_workload_identity_pool" "terraform_pool" {
   workload_identity_pool_id = var.pool_id
   display_name              = "Terraform Enterprise"
   description               = "Workload Identity Pool for Terraform Enterprise"
-  
+
   disabled = false
-  
+
   depends_on = [google_project_service.required_apis]
 }
 
@@ -28,16 +28,16 @@ resource "google_iam_workload_identity_pool_provider" "terraform_provider" {
   workload_identity_pool_provider_id = var.provider_id
   display_name                       = "Terraform Enterprise OIDC"
   description                        = "OIDC provider for Terraform Enterprise"
-  
+
   attribute_mapping = {
     "google.subject"                        = "assertion.sub"
     "attribute.terraform_workspace_id"      = "assertion.terraform_workspace_id"
     "attribute.terraform_full_workspace"    = "assertion.terraform_full_workspace"
     "attribute.terraform_organization_name" = "assertion.terraform_organization_name"
   }
-  
+
   attribute_condition = "assertion.terraform_organization_name==\"${var.terraform_org_name}\""
-  
+
   oidc {
     issuer_uri = var.issuer_uri
   }
@@ -53,7 +53,7 @@ resource "google_service_account" "terraform" {
 # Grant IAM Roles to Service Account
 resource "google_project_iam_member" "terraform_roles" {
   for_each = toset(var.sa_roles)
-  
+
   project = var.project_id
   role    = each.value
   member  = "serviceAccount:${google_service_account.terraform.email}"
@@ -63,6 +63,15 @@ resource "google_project_iam_member" "terraform_roles" {
 resource "google_service_account_iam_member" "workload_identity_user" {
   service_account_id = google_service_account.terraform.name
   role               = "roles/iam.workloadIdentityUser"
-  
+
   member = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.terraform_pool.name}/attribute.terraform_workspace_id/${var.tfe_workspace_id}"
+}
+
+resource "google_organization_iam_binding" "folder_admin_binding" {
+  org_id = var.org_id
+  role   = "roles/resourcemanager.folderAdmin"
+
+  members = [
+    "serviceAccount:${google_service_account.terraform.email}",
+  ]
 }

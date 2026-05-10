@@ -1,0 +1,15 @@
+digraph G {
+  rankdir = "RL";
+  node [shape = rect, fontname = "sans-serif"];
+  "google_iam_workload_identity_pool.terraform_pool" [label="google_iam_workload_identity_pool.terraform_pool"];
+  "google_iam_workload_identity_pool_provider.terraform_provider" [label="google_iam_workload_identity_pool_provider.terraform_provider"];
+  "google_project_iam_member.terraform_roles" [label="google_project_iam_member.terraform_roles"];
+  "google_project_service.required_apis" [label="google_project_service.required_apis"];
+  "google_service_account.terraform" [label="google_service_account.terraform"];
+  "google_service_account_iam_member.workload_identity_user" [label="google_service_account_iam_member.workload_identity_user"];
+  "google_iam_workload_identity_pool.terraform_pool" -> "google_project_service.required_apis";
+  "google_iam_workload_identity_pool_provider.terraform_provider" -> "google_iam_workload_identity_pool.terraform_pool";
+  "google_project_iam_member.terraform_roles" -> "google_service_account.terraform";
+  "google_service_account_iam_member.workload_identity_user" -> "google_iam_workload_identity_pool.terraform_pool";
+  "google_service_account_iam_member.workload_identity_user" -> "google_service_account.terraform";
+}
